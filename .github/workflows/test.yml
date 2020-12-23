@@ -102,7 +102,6 @@ jobs:
            architecture: 'x64'
        - env:
            PR_NUMBER: ${{ github.event.pull_request.number }}
-           GITHUB_CONTEXT: ${{ toJson(github) }}
          run: |
            BRANCH_NAME=${GITHUB_REF##*/}
            # Commit message code from https://github.community/t/accessing-commit-message-in-pull-request-event/17158/2
