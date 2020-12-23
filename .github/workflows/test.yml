@@ -102,12 +102,14 @@ jobs:
            architecture: 'x64'
        - env:
            PR_NUMBER: ${{ github.event.pull_request.number }}
+           GITHUB_CONTEXT: ${{ toJson(github) }}
          run: |
            BRANCH_NAME=${GITHUB_REF##*/}
-           COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
-           # TODO: Need to confirm GITHUB_REF is just "master" while on master,
-           #  also that PR_NUMBER is actually "" when not in a PR.
-           echo "GITHUB_REF: $GITHUB_REF"
+           # Commit message code from https://github.community/t/accessing-commit-message-in-pull-request-event/17158/2
+           COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.event.after }})
+           # TODO: Need to confirm BRANCH_NAME is just "master" while on
+           #  master, also that PR_NUMBER is actually "" when not in a PR.
+           echo "BRANCH_NAME: $BRANCH_NAME"
            echo "Commit message: $COMMIT_MESSAGE"
            echo "PR #: $PR_NUMBER"
 
