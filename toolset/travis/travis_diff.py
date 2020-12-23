@@ -58,8 +58,8 @@ def quit_diffing():
 
 curr_branch = ""
 is_PR = (os.getenv("PR_NUMBER") != "")
-# GITHUB_REF is the the name of the branch
-is_master = not is_PR and os.getenv("GITHUB_REF") == "master"
+# BRANCH_NAME is the the name of the branch
+is_master = not is_PR and os.getenv("BRANCH_NAME") == "master"
 
 if is_PR:
     curr_branch = "FETCH_HEAD"
