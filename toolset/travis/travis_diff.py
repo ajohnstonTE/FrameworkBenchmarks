@@ -57,15 +57,14 @@ def quit_diffing():
 
 
 curr_branch = ""
-is_PR = (os.getenv("TRAVIS_PULL_REQUEST") != "false")
-# TRAVIS_BRANCH is the target branch when it's a pull request or the name
-# of the branch when it isn't
-is_master = not is_PR and os.getenv("TRAVIS_BRANCH") == "master"
+is_PR = (os.getenv("PR_NUMBER") != "")
+# GITHUB_REF is the the name of the branch
+is_master = not is_PR and os.getenv("GITHUB_REF") == "master"
 
 if is_PR:
     curr_branch = "FETCH_HEAD"
 elif not is_master:
-    curr_branch = os.getenv("TRAVIS_COMMIT")
+    curr_branch = os.getenv("GITHUB_SHA")
     # Also fetch master to compare against
     subprocess.check_output(['bash', '-c', 'git fetch origin master:master'])
 
@@ -85,7 +84,7 @@ if len(changes.split('\n')) > 10:
 # COMMIT MESSAGES:
 # Before any complicated diffing, check for forced runs from the commit message
 # Use -2 because travis now inserts a merge commit as the last commit
-last_commit_msg = os.getenv("TRAVIS_COMMIT_MESSAGE")
+last_commit_msg = os.getenv("COMMIT_MESSAGE")
 
 test_dirs = []
 run_tests = []
