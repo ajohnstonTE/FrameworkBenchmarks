@@ -103,7 +103,7 @@ jobs:
        - env:
            COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
            PR_NUMBER: ${{ github.event.pull_request.number }}
-       - run: |
+         run: |
            # TODO: Need to confirm GITHUB_REF is just "master" while on master,
            #  also that PR_NUMBER is actually "" when not in a PR.
            echo "GITHUB_REF: $GITHUB_REF"
