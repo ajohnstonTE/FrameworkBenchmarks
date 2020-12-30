@@ -95,34 +95,64 @@ jobs:
           - TESTLANG: "VB"
           - TESTLANG: "Mumps"
     steps:
-       - uses: actions/checkout@v2
-       - uses: actions/setup-python@v2
-         with:
-           python-version: '2.7'
-           architecture: 'x64'
-       - env:
-           PR_NUMBER: ${{ github.event.pull_request.number }}
-         run: |
-           BRANCH_NAME=${GITHUB_REF##*/}
-           # Commit message code from https://github.community/t/accessing-commit-message-in-pull-request-event/17158/2
-           COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.event.after }})
-           # TODO: Need to confirm BRANCH_NAME is just "master" while on
-           #  master, also that PR_NUMBER is actually "" when not in a PR.
-           echo "BRANCH_NAME: $BRANCH_NAME"
-           echo "Commit message: $COMMIT_MESSAGE"
-           echo "PR #: $PR_NUMBER"
+      # Currently working through suggestions from https://github.community/t/accessing-commit-message-in-pull-request-event/17158/2 to get commit message
+      # We need to fetch more than one commit to be able to access HEAD^2 in case
+      # of a pull request
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 10
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '2.7'
+          architecture: 'x64'
+      # In case of a push event, the commit we care about is simply HEAD.
+      # The current branch name can be found by parsing GITHUB_REF, for example,
+      # if we are on the master branch, then GITHUB_REF = refs/heads/master.
+      - name: Get commit branch and commit message
+        if: github.event_name == 'push'
+        run: |
+          echo "COMMIT_BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$(git log --format=%B -n 1 HEAD)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      # In case of a pull_request event, the commit we care about is HEAD^2, that
+      # is, the second parent of the pull request merge commit.
+      # The current branch name is directly given by GITHUB_HEAD_REF
+      - name: Get commit branch and commit message
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "COMMIT_BRANCH=$GITHUB_HEAD_REF" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$(git log --format=%B -n 1 HEAD^2)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Log commit branch and commit message
+        run: |
+          echo COMMIT_BRANCH: "$COMMIT_BRANCH"
+          echo COMMIT_MESSAGE: "$COMMIT_MESSAGE"
+          echo GITHUB_ENV: "$GITHUB_ENV"
+      - env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          BRANCH_NAME=${GITHUB_REF##*/}
+          # Commit message code from https://github.community/t/accessing-commit-message-in-pull-request-event/17158/2
+          COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{ github.event.after }})
+          # TODO: Need to confirm BRANCH_NAME is just "master" while on
+          #  master, also that PR_NUMBER is actually "" when not in a PR.
+          echo "BRANCH_NAME: $BRANCH_NAME"
+          echo "Commit message: $COMMIT_MESSAGE"
+          echo "PR #: $PR_NUMBER"
 
-           # Runs travis_diff, printing the output to the terminal, and searches for travis-diff-continue
-           # to determine if the suite should be installed and the current $TESTDIR test should run.
-           export RUN_TESTS=`./toolset/travis/travis_diff.py | tee /dev/tty | grep -oP "travis-run-tests \K(.*)"`
+          # Runs travis_diff, printing the output to the terminal, and searches for travis-diff-continue
+          # to determine if the suite should be installed and the current $TESTDIR test should run.
+          export RUN_TESTS=`./toolset/travis/travis_diff.py | tee /dev/tty | grep -oP "travis-run-tests \K(.*)"`
 
-           if [ "$RUN_TESTS" ]; then docker build -t techempower/tfb - < ./Dockerfile; fi
+          if [ "$RUN_TESTS" ]; then docker build -t techempower/tfb - < ./Dockerfile; fi
 
-           # Stop services that would claim ports we may need
-           sudo service mysql stop || true
-           sudo service postgresql stop || true
+          # Stop services that would claim ports we may need
+          sudo service mysql stop || true
+          sudo service postgresql stop || true
 
-           # run-ci.py runs the diffing to see if travis needs to test this framework. Ideally/eventually,
-           # we'd like to try and do the diffing before travis_clean & setup.
-           # This will run the tests exactly as you would in your own vm:
-           if [ "$RUN_TESTS" ]; then docker network create tfb > /dev/null 2>&1 && docker run --network=tfb -v /var/run/docker.sock:/var/run/docker.sock --mount type=bind,source=`pwd`,target=/FrameworkBenchmarks techempower/tfb --mode verify --test-dir $RUN_TESTS --results-environment Travis; else echo 'Skipping test verification.'; fi
+          # run-ci.py runs the diffing to see if travis needs to test this framework. Ideally/eventually,
+          # we'd like to try and do the diffing before travis_clean & setup.
+          # This will run the tests exactly as you would in your own vm:
+          if [ "$RUN_TESTS" ]; then docker network create tfb > /dev/null 2>&1 && docker run --network=tfb -v /var/run/docker.sock:/var/run/docker.sock --mount type=bind,source=`pwd`,target=/FrameworkBenchmarks techempower/tfb --mode verify --test-dir $RUN_TESTS --results-environment Travis; else echo 'Skipping test verification.'; fi
