@@ -33,7 +33,7 @@ public class GhApplication
   protected Dispatcher constructDispatcher()
   {
     final PathDispatcher.Configuration<Context> config = new PathDispatcher.Configuration<>();
-
+    System.out.println("Nothing");
     config.setDefault(new HelloHandler(this))
           .add(new BasicExceptionHandler(this));
 
