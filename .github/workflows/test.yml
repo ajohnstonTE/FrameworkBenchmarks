@@ -133,21 +133,21 @@ jobs:
           # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: ./toolset/travis/travis_diff.py
-      - name: Get list of changes
+      - id: get_diff
+        name: Get list of changes
         env:
           # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
           PR_NUMBER: ${{ github.event.pull_request.number }}
         # Runs travis_diff, with the the output accessible in later steps
-        run: |
-          DIFF=$(./toolset/travis/travis_diff.py)
-          echo "$DIFF" >> $GITHUB_ENV
-      - name: Check if tests need to be run
+        run: echo "::set-output name=diff::$(./toolset/travis/travis_diff.py)"
+      - id: should_run_tests
+        name: Check if tests need to be run
+        env:
+          DIFF: ${{ steps.get_diff.outputs.diff }}
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
-        run: |
-          RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
-          echo "$RUN_TESTS" >> $GITHUB_ENV
+        run: echo "::set-output name=run_tests::$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)"
       - name: Build tfb dockerfile
-        if: ${{ env.RUN_TESTS }}
+        if: ${{ steps.should_run_tests.outputs.run_tests }}
         run: docker build -t techempower/tfb - < ./Dockerfile;
       - name: Stop services
         # Stop services that would claim ports we may need
@@ -155,7 +155,7 @@ jobs:
           sudo service mysql stop || true
           sudo service postgresql stop || true
       - name: Run tests if needed
-        if: ${{ env.RUN_TESTS }}
+        if: ${{ steps.should_run_tests.outputs.run_tests }}
         run: |
           # run-ci.py runs the diffing to see if travis needs to test this framework. Ideally/eventually,
           # we'd like to try and do the diffing before travis_clean & setup.
