@@ -101,13 +101,9 @@ jobs:
       #
       # We need to fetch more than one commit to be able to access HEAD^2 in case
       # of a pull request
-      - if: github.event_name == 'pull_request'
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 10
-      - if: github.event_name == 'push'
-        uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: '2.7'
