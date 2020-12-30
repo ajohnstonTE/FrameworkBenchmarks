@@ -128,6 +128,11 @@ jobs:
           echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
           echo "$(git log --format=%B -n 1 HEAD^2)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+      - name: Get list of changes (console)
+        env:
+          # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: ./toolset/travis/travis_diff.py
       - name: Get list of changes
         env:
           # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
