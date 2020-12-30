@@ -136,7 +136,7 @@ jobs:
         run: DIFF=$(./toolset/travis/travis_diff.py)
       - name: Check if tests need to be run
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
-        run: RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)"
+        run: RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
       - name: Run tests
         run: |
           if [ "$RUN_TESTS" ]; then docker build -t techempower/tfb - < ./Dockerfile; fi
