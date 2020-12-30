@@ -94,6 +94,9 @@ jobs:
           - TESTLANG: "Vala"
           - TESTLANG: "VB"
           - TESTLANG: "Mumps"
+    env:
+      TESTLANG: ${{ matrix.TESTLANG }}
+      TESTDIR: ${{ matrix.TESTDIR }}
     steps:
       # Commit branch/name extraction from:
       # https://github.community/t/accessing-commit-message-in-pull-request-event/17158/2
