@@ -128,36 +128,17 @@ jobs:
           echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
           echo "$(git log --format=%B -n 1 HEAD^2)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-      - id: get_diff
-        name: Get list of changes
+      - name: Get list of changes
         env:
           # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
           PR_NUMBER: ${{ github.event.pull_request.number }}
+        # Runs travis_diff, with the the output accessible in later steps
+        run: DIFF=$(./toolset/travis/travis_diff.py)
+      - name: Check if tests need to be run
+        # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
+        run: RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)"
+      - name: Run tests
         run: |
-          # Runs travis_diff, with the the output accessible in later steps
-          echo "::set-output name=diff::$(./toolset/travis/travis_diff.py)"
-      - name: View output of previous step
-        run: |
-          echo get_diff.diff:
-          echo "${{steps.get_diff.outputs.diff}}"
-      - id: should_run_tests
-        name: Check if tests need to be run
-        run: |
-          # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
-          echo "::set-output name=run_tests::$(grep -oP "travis-run-tests \K(.*)" <<< ${{steps.get_diff.outputs.diff}})"
-      - name: View output of previous step
-        run: |
-          echo should_run_tests.run_tests:
-          echo "${{steps.should_run_tests.outputs.run_tests}}"
-      - env:
-          RUN_TESTS: ${{steps.should_run_tests.outputs.run_tests}}
-          # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          # Runs travis_diff, printing the output to the terminal, and searches for travis-diff-continue
-          # to determine if the suite should be installed and the current $TESTDIR test should run.
-          export RUN_TESTS=`./toolset/travis/travis_diff.py | grep -oP "travis-run-tests \K(.*)"`
-
           if [ "$RUN_TESTS" ]; then docker build -t techempower/tfb - < ./Dockerfile; fi
 
           # Stop services that would claim ports we may need
