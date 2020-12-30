@@ -137,15 +137,18 @@ jobs:
       - name: Check if tests need to be run
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
         run: RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
-      - name: Run tests
+      - name: Build tfb dockerfile
+        if: $RUN_TESTS
+        run: docker build -t techempower/tfb - < ./Dockerfile;
+      - name: Stop services
+        # Stop services that would claim ports we may need
         run: |
-          if [ "$RUN_TESTS" ]; then docker build -t techempower/tfb - < ./Dockerfile; fi
-
-          # Stop services that would claim ports we may need
           sudo service mysql stop || true
           sudo service postgresql stop || true
-
+      - name: Run tests if needed
+        if: $RUN_TESTS
+        run: |
           # run-ci.py runs the diffing to see if travis needs to test this framework. Ideally/eventually,
           # we'd like to try and do the diffing before travis_clean & setup.
           # This will run the tests exactly as you would in your own vm:
-          if [ "$RUN_TESTS" ]; then docker network create tfb > /dev/null 2>&1 && docker run --network=tfb -v /var/run/docker.sock:/var/run/docker.sock --mount type=bind,source=`pwd`,target=/FrameworkBenchmarks techempower/tfb --mode verify --test-dir $RUN_TESTS --results-environment Travis; else echo 'Skipping test verification.'; fi
+          docker network create tfb > /dev/null 2>&1 && docker run --network=tfb -v /var/run/docker.sock:/var/run/docker.sock --mount type=bind,source=`pwd`,target=/FrameworkBenchmarks techempower/tfb --mode verify --test-dir $RUN_TESTS --results-environment Travis;
