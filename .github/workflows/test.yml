@@ -138,7 +138,7 @@ jobs:
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
         run: RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
       - name: Build tfb dockerfile
-        if: $RUN_TESTS
+        if: ${{ env.RUN_TESTS }}
         run: docker build -t techempower/tfb - < ./Dockerfile;
       - name: Stop services
         # Stop services that would claim ports we may need
@@ -146,7 +146,7 @@ jobs:
           sudo service mysql stop || true
           sudo service postgresql stop || true
       - name: Run tests if needed
-        if: $RUN_TESTS
+        if: ${{ env.RUN_TESTS }}
         run: |
           # run-ci.py runs the diffing to see if travis needs to test this framework. Ideally/eventually,
           # we'd like to try and do the diffing before travis_clean & setup.
