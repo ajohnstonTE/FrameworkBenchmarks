@@ -128,15 +128,12 @@ jobs:
           echo "$(git log --format=%B -n 1 HEAD^2)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - env:
+          # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          # TODO: Need to confirm BRANCH_NAME is just "master" while on
-          #  master, also that PR_NUMBER is actually "" when not in a PR.
-          echo "PR #: $PR_NUMBER"
-
           # Runs travis_diff, printing the output to the terminal, and searches for travis-diff-continue
           # to determine if the suite should be installed and the current $TESTDIR test should run.
-          export RUN_TESTS=`./toolset/travis/travis_diff.py | tee /dev/tty | grep -oP "travis-run-tests \K(.*)"`
+          export RUN_TESTS=`./toolset/travis/travis_diff.py | grep -oP "travis-run-tests \K(.*)"`
 
           if [ "$RUN_TESTS" ]; then docker build -t techempower/tfb - < ./Dockerfile; fi
 
