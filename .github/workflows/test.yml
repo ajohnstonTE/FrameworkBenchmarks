@@ -138,10 +138,14 @@ jobs:
           # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
           PR_NUMBER: ${{ github.event.pull_request.number }}
         # Runs travis_diff, with the the output accessible in later steps
-        run: echo "DIFF=$(./toolset/travis/travis_diff.py)" >> $GITHUB_ENV
+        run: |
+          DIFF=$(./toolset/travis/travis_diff.py)
+          echo "$DIFF" >> $GITHUB_ENV
       - name: Check if tests need to be run
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
-        run: echo "RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)" >> $GITHUB_ENV
+        run: |
+          RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
+          echo "$RUN_TESTS" >> $GITHUB_ENV
       - name: Build tfb dockerfile
         if: ${{ env.RUN_TESTS }}
         run: docker build -t techempower/tfb - < ./Dockerfile;
