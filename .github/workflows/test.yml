@@ -146,6 +146,11 @@ jobs:
           DIFF: ${{ steps.get_diff.outputs.diff }}
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
         run: echo "::set-output name=run_tests::$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)"
+      - name: Log status
+        env:
+          RUN_TESTS: ${{ steps.should_run_tests.outputs.run_tests }}
+        run: |
+          if [ "$RUN_TESTS" ]; then echo "Proceeding to run tests."; else echo 'Skipping test verification.'; fi
       - name: Build tfb dockerfile
         if: ${{ steps.should_run_tests.outputs.run_tests }}
         run: docker build -t techempower/tfb - < ./Dockerfile;
