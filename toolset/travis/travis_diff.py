@@ -68,6 +68,13 @@ elif not is_master:
 
 # Also fetch master to compare against
 subprocess.check_output(['bash', '-c', 'git fetch origin master:master'])
+print("Test:")
+print("git diff: " + curr_branch)
+print(subprocess.check_output([
+    'bash', '-c',
+    'git --no-pager diff --name-only {0} $(git merge-base {0} master)'
+        .format(curr_branch)
+]))
 # https://stackoverflow.com/questions/25071579/list-all-files-changed-in-a-pull-request-in-git-github
 changes = clean_output(
     subprocess.check_output([
