@@ -144,7 +144,7 @@ jobs:
         name: Check if tests need to be run
         run: |
           # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
-          echo "::set-output name=run_tests::$(grep -oP "travis-run-tests \K(.*)" ${{steps.get_diff.outputs.diff}})"
+          echo "::set-output name=run_tests::$(grep -oP "travis-run-tests \K(.*)" <<< ${{steps.get_diff.outputs.diff}})"
       - name: View output of previous step
         run: |
           echo should_run_tests.run_tests:
