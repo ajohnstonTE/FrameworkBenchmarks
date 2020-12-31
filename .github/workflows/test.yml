@@ -86,7 +86,8 @@ jobs:
           - TESTDIR: "Scala/finatra Scala/finch Scala/http4s"
           - TESTDIR: "Scala/play2-scala Scala/scalene Scala/youi"
           - TESTDIR: "Scala/vertx-web-scala"
-          - TESTLANG: "Scheme"
+# Scheme is not currently present in the repository
+#          - TESTLANG: "Scheme"
           - TESTLANG: "Swift"
           - TESTLANG: "TypeScript"
           - TESTLANG: "Ur"
