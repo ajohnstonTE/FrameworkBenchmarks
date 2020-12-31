@@ -143,6 +143,10 @@ jobs:
         # Runs travis_diff, with the the output accessible in later steps
         run: |
           DIFF="$(./toolset/travis/travis_diff.py)"
+          # Escape the multiline string for Github Actions
+          DIFF="${DIFF//'%'/'%25'}"
+          DIFF="${DIFF//$'\n'/'%0A'}"
+          DIFF="${DIFF//$'\r'/'%0D'}"
           echo "DIFF: $DIFF"
           echo "END OF DIFF"
           echo "::set-output name=diff::$DIFF"
@@ -155,6 +159,10 @@ jobs:
           echo "DIFF: $DIFF"
           echo "END OF DIFF"
           RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
+          # Escape the multiline string for Github Actions
+          RUN_TESTS="${RUN_TESTS//'%'/'%25'}"
+          RUN_TESTS="${RUN_TESTS//$'\n'/'%0A'}"
+          RUN_TESTS="${RUN_TESTS//$'\r'/'%0D'}"
           echo "RUN_TESTS: $RUN_TESTS"
           echo "END OF RUN_TESTS"
           echo "::set-output name=run_tests::$RUN_TESTS"
