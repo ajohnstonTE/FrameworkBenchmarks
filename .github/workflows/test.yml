@@ -141,13 +141,19 @@ jobs:
           # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
           PR_NUMBER: ${{ github.event.pull_request.number }}
         # Runs travis_diff, with the the output accessible in later steps
-        run: echo "::set-output name=diff::$(./toolset/travis/travis_diff.py)"
+        run: |
+          DIFF="$(./toolset/travis/travis_diff.py)"
+          echo "DIFF: $DIFF"
+          echo "::set-output name=diff::$DIFF"
       - id: should_run_tests
         name: Check if tests need to be run
         env:
           DIFF: ${{ steps.get_diff.outputs.diff }}
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
-        run: echo "::set-output name=run_tests::$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)"
+        run: |
+          RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
+          echo "RUN_TESTS: $RUN_TESTS"
+          echo "::set-output name=run_tests::$RUN_TESTS"
       - name: Log status
         env:
           RUN_TESTS: ${{ steps.should_run_tests.outputs.run_tests }}
