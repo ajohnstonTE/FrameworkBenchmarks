@@ -161,7 +161,7 @@ jobs:
           echo "Starting grep stuff"
           echo "here it is A: $(grep -oP "travis-run-tests \K(.*)" <<< "some text")"
           echo "here it is B: $(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)"
-          RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
+          export RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
           echo "FINISHED THAT"
           echo "RUN_TESTS right after: $RUN_TESTS"
           echo "END OF RUN_TESTS right after"
