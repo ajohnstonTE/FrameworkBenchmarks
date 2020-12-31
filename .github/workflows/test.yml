@@ -95,11 +95,14 @@ jobs:
           - TESTLANG: "Vala"
           - TESTLANG: "VB"
           - TESTLANG: "Mumps"
+      # Disable fail-fast to allow all failing frameworks/etc to fail in a
+      # single build, rather than stopping when the first one fails.
       fail-fast: false
     env:
       TESTLANG: ${{ matrix.TESTLANG }}
       TESTDIR: ${{ matrix.TESTDIR }}
     steps:
+      # TODO: Support [ci skip], which was natively supported by Travis
       # Commit branch/name extraction from:
       # https://github.community/t/accessing-commit-message-in-pull-request-event/17158/2
       #
@@ -133,26 +136,28 @@ jobs:
           echo "$(git log --format=%B -n 1 HEAD^2)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - id: get_diff
-        name: Get list of changes
+        name: Get all changes vs master
         env:
-          # TODO: Need to confirm BRANCH_NAME is just "master" while on master, also that PR_NUMBER is actually "" when not in a PR
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        # Runs travis_diff, with the the output accessible in later steps
+        # Runs github_actions_diff, with the the output accessible in later steps
         run: |
-          DIFF="$(./toolset/travis/travis_diff.py)"
-          # Escape the multiline string for Github Actions
+          DIFF="$(./toolset/github_actions/github_actions_diff.py)"
+          # Escape the multiline string for Github Actions, see https://github.community/t/set-output-truncates-multiline-strings/16852/3
           DIFF="${DIFF//'%'/'%25'}"
           DIFF="${DIFF//$'\n'/'%0A'}"
           DIFF="${DIFF//$'\r'/'%0D'}"
           echo "::set-output name=diff::$DIFF"
       - id: should_run_tests
-        name: Check if tests need to be run
+        name: Determine which (if any) tests need to be run
         env:
           DIFF: ${{ steps.get_diff.outputs.diff }}
-        # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
+        # Searches for github-actions-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
         run: |
-          RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF || true)
-          # Escape the multiline string for Github Actions
+          # grep returns status code 1 if no matches are found. This fails the
+          # build as it is a non-zero status. But this is an expected
+          # possibility, so `|| true` is used to address/silence that.
+          RUN_TESTS=$(grep -oP "github-actions-run-tests \K(.*)" <<< $DIFF || true)
+          # Escape the multiline string for Github Actions, see https://github.community/t/set-output-truncates-multiline-strings/16852/3
           RUN_TESTS="${RUN_TESTS//'%'/'%25'}"
           RUN_TESTS="${RUN_TESTS//$'\n'/'%0A'}"
           RUN_TESTS="${RUN_TESTS//$'\r'/'%0D'}"
@@ -175,7 +180,7 @@ jobs:
         env:
           RUN_TESTS: ${{ steps.should_run_tests.outputs.run_tests }}
         run: |
-          # run-ci.py runs the diffing to see if travis needs to test this framework. Ideally/eventually,
-          # we'd like to try and do the diffing before travis_clean & setup.
+          # run-ci.py runs the diffing to see if github actions needs to test this framework. Ideally/eventually,
+          # we'd like to try and do the diffing before github_actions_clean & setup.
           # This will run the tests exactly as you would in your own vm:
-          docker network create tfb > /dev/null 2>&1 && docker run --network=tfb -v /var/run/docker.sock:/var/run/docker.sock --mount type=bind,source=`pwd`,target=/FrameworkBenchmarks techempower/tfb --mode verify --test-dir $RUN_TESTS --results-environment Travis;
+          docker network create tfb > /dev/null 2>&1 && docker run --network=tfb -v /var/run/docker.sock:/var/run/docker.sock --mount type=bind,source=`pwd`,target=/FrameworkBenchmarks techempower/tfb --mode verify --test-dir $RUN_TESTS --results-environment Github-Actions;
