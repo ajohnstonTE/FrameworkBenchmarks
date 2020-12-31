@@ -144,6 +144,7 @@ jobs:
         run: |
           DIFF="$(./toolset/travis/travis_diff.py)"
           echo "DIFF: $DIFF"
+          echo "END OF DIFF"
           echo "::set-output name=diff::$DIFF"
       - id: should_run_tests
         name: Check if tests need to be run
@@ -151,8 +152,11 @@ jobs:
           DIFF: ${{ steps.get_diff.outputs.diff }}
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
         run: |
+          echo "DIFF: $DIFF"
+          echo "END OF DIFF"
           RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
           echo "RUN_TESTS: $RUN_TESTS"
+          echo "END OF RUN_TESTS"
           echo "::set-output name=run_tests::$RUN_TESTS"
       - name: Log status
         env:
