@@ -147,8 +147,6 @@ jobs:
           DIFF="${DIFF//'%'/'%25'}"
           DIFF="${DIFF//$'\n'/'%0A'}"
           DIFF="${DIFF//$'\r'/'%0D'}"
-          echo "DIFF: $DIFF"
-          echo "END OF DIFF"
           echo "::set-output name=diff::$DIFF"
       - id: should_run_tests
         name: Check if tests need to be run
@@ -156,21 +154,11 @@ jobs:
           DIFF: ${{ steps.get_diff.outputs.diff }}
         # Searches for travis-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
         run: |
-          echo "DIFF: $DIFF"
-          echo "END OF DIFF"
-          echo "Starting grep stuff"
-          echo "here it is A: $(grep -oP "travis-run-tests \K(.*)" <<< "some text")"
-          echo "here it is B: $(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)"
-          export RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
-          echo "FINISHED THAT"
-          echo "RUN_TESTS right after: $RUN_TESTS"
-          echo "END OF RUN_TESTS right after"
+          RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF || true)
           # Escape the multiline string for Github Actions
           RUN_TESTS="${RUN_TESTS//'%'/'%25'}"
           RUN_TESTS="${RUN_TESTS//$'\n'/'%0A'}"
           RUN_TESTS="${RUN_TESTS//$'\r'/'%0D'}"
-          echo "RUN_TESTS: $RUN_TESTS"
-          echo "END OF RUN_TESTS"
           echo "::set-output name=run_tests::$RUN_TESTS"
       - name: Log status
         env:
