@@ -158,7 +158,8 @@ jobs:
         run: |
           echo "DIFF: $DIFF"
           echo "END OF DIFF"
-          RUN_TESTS="$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)"
+          RUN_TESTS=$(grep -oP "travis-run-tests \K(.*)" <<< $DIFF)
+          echo "FINISHED THAT"
           echo "RUN_TESTS right after: $RUN_TESTS"
           echo "END OF RUN_TESTS right after"
           # Escape the multiline string for Github Actions
