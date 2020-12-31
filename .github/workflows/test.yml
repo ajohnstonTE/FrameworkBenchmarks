@@ -170,6 +170,8 @@ jobs:
           sudo service postgresql stop || true
       - name: Run tests if needed
         if: ${{ steps.should_run_tests.outputs.run_tests }}
+        env:
+          RUN_TESTS: ${{ steps.should_run_tests.outputs.run_tests }}
         run: |
           # run-ci.py runs the diffing to see if travis needs to test this framework. Ideally/eventually,
           # we'd like to try and do the diffing before travis_clean & setup.
