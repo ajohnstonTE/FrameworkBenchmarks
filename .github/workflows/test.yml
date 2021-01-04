@@ -12,11 +12,34 @@ jobs:
         with:
           fetch-depth: 10
       - name: Get commit branch and commit message from push
-        env:
-          TEST: ${{ toJSON(github.event) }}
+        if: github.event_name == 'push'
         run: |
-          echo this is a test
+          echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$(git log --format=%B -n 1 HEAD)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Get commit branch and commit message from PR
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$(git log --format=%B -n 1 HEAD^2)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - id: result
+        name: Skip if commit message contains [ci skip]
+        run: |
+          echo "::set-output name=skip::$(grep "[ci skip]" <<< $COMMIT_MESSAGE || true)"
+    outputs:
+      skip: ${{ steps.result.outputs.skip }}
+  debug:
+    needs: check-skip
+    runs-on: ubuntu-18.04
+    env:
+      TEST: ${{ needs.check-skip.outputs.skip }}
+    steps:
+      - run: |
+          echo foo
   test:
+    needs: check-skip
+    if: ${{ !needs.check-skip.outputs.skip }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
@@ -113,7 +136,6 @@ jobs:
       TESTLANG: ${{ matrix.TESTLANG }}
       TESTDIR: ${{ matrix.TESTDIR }}
     steps:
-      # TODO: Support [ci skip], which was natively supported by Travis
       # Commit branch/name extraction from:
       # https://github.community/t/accessing-commit-message-in-pull-request-event/17158/2
       #
