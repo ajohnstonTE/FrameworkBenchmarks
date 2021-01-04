@@ -60,7 +60,7 @@ jobs:
           echo foo
   test:
     needs: setup
-    if: ${{ contains(needs.setup.outputs.commit_message, "[ci skip]") }}
+    if: ${{ contains(needs.setup.outputs.commit_message, '[ci skip]') }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
