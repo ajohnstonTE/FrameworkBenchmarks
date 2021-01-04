@@ -57,7 +57,7 @@ jobs:
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - run: |
-          echo foo
+          echo bar
   test:
     needs: setup
     if: ${{ !contains(needs.setup.outputs.commit_message, '[ci skip]') }}
