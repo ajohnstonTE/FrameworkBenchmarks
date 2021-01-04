@@ -43,8 +43,8 @@ jobs:
           COMMIT_MESSAGE="${COMMIT_MESSAGE//'%'/'%25'}"
           COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\n'/'%0A'}"
           COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\r'/'%0D'}"
-          echo "::set-output name=commit_message::COMMIT_MESSAGE"
-          echo "::set-output name=branch_name::COMMIT_MESSAGE"
+          echo "::set-output name=commit_message::$COMMIT_MESSAGE"
+          echo "::set-output name=branch_name::$BRANCH_NAME"
     outputs:
       commit_message: ${{ steps.out.outputs.commit_message }}
       branch_name: ${{ steps.out.outputs.branch_name }}
@@ -60,7 +60,7 @@ jobs:
           echo foo
   test:
     needs: setup
-    if: ${{ contains(needs.setup.outputs.commit_message, '[ci skip]') }}
+    if: ${{ !contains(needs.setup.outputs.commit_message, '[ci skip]') }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
