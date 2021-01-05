@@ -159,8 +159,9 @@ jobs:
         name: Get all changes vs master
         # Runs github_actions_diff, with the the output accessible in later steps
         run: |
-          DIFF=$(./toolset/github_actions/github_actions_diff.py)
-          echo "DIFF=$DIFF" >> $GITHUB_ENV
+          echo "DIFF<<EOF" >> $GITHUB_ENV
+          echo "$(./toolset/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
       - id: should_run_tests
         name: Determine which (if any) tests need to be run
         # Searches for github-actions-diff-continue to determine if the suite should be installed and the current $TESTDIR test should run.
@@ -168,8 +169,9 @@ jobs:
           # grep returns status code 1 if no matches are found. This fails the
           # build as it is a non-zero status. But this is an expected
           # possibility, so `|| true` is used to address/silence that.
-          RUN_TESTS=$(grep -oP "github-actions-run-tests \K(.*)" <<< $DIFF || true)
-          echo "RUN_TESTS=$RUN_TESTS" >> $GITHUB_ENV
+          echo "RUN_TESTS<<EOF" >> $GITHUB_ENV
+          echo "$(grep -oP "github-actions-run-tests \K(.*)" <<< $DIFF || true)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
       - name: Log status
         run: |
           if [ "$RUN_TESTS" ]; then echo "Proceeding to run tests."; else echo 'Skipping test verification.'; fi
