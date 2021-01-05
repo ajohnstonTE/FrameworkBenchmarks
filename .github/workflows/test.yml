@@ -150,13 +150,9 @@ jobs:
       BRANCH_NAME: ${{ needs.setup.outputs.branch_name }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
-      - if: github.event_name == 'pull_request'
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 10
-      - if: github.event_name == 'push'
-        uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: '2.7'
@@ -165,7 +161,7 @@ jobs:
         name: Get all changes vs master
         # Runs github_actions_diff, with the the output accessible in later steps
         run: |
-          echo "$(./toolset/github_actions/github_actions_diff.py)"
+          # Write the result to env.DIFF for later steps
           echo "DIFF<<EOF" >> $GITHUB_ENV
           echo "$(./toolset/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -176,6 +172,7 @@ jobs:
           # grep returns status code 1 if no matches are found. This fails the
           # build as it is a non-zero status. But this is an expected
           # possibility, so `|| true` is used to address/silence that.
+          # Write the result to env.RUN_TESTS for later steps
           echo "RUN_TESTS<<EOF" >> $GITHUB_ENV
           echo "$(grep -oP "github-actions-run-tests \K(.*)" <<< $DIFF || true)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
