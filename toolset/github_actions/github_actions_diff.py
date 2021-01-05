@@ -59,7 +59,7 @@ def quit_diffing():
 curr_branch = ""
 is_PR = (os.getenv("PR_NUMBER") != "")
 # BRANCH_NAME is the the name of the branch
-is_master = os.getenv("BRANCH_NAME") == "master"
+is_master = os.getenv("BRANCH_NAME") == "test-master"
 
 if is_PR:
     curr_branch = "HEAD"
@@ -68,13 +68,13 @@ elif not is_master:
 
 if not is_master:
     # Also fetch master to compare against
-    subprocess.check_output(['bash', '-c', 'git fetch origin master:master'])
+    subprocess.check_output(['bash', '-c', 'git fetch origin test-master:test-master'])
 
 # https://stackoverflow.com/questions/25071579/list-all-files-changed-in-a-pull-request-in-git-github
 changes = clean_output(
     subprocess.check_output([
         'bash', '-c',
-        'git --no-pager diff --name-only {0} $(git merge-base {0} master)'
+        'git --no-pager diff --name-only {0} $(git merge-base {0} test-master)'
             .format(curr_branch)
     ]))
 print("Determining what to run based on the following file changes: \n{!s}"

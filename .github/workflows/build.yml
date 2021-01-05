@@ -1,9 +1,9 @@
 name: build
 on:
   push:
-    branches: [ master ]
+    branches: [ master, test-master ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, test-master ]
 jobs:
   setup:
     runs-on: ubuntu-18.04
