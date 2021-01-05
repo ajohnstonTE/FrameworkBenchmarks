@@ -159,6 +159,7 @@ jobs:
         name: Get all changes vs master
         # Runs github_actions_diff, with the the output accessible in later steps
         run: |
+          echo "$(./toolset/github_actions/github_actions_diff.py)"
           echo "DIFF<<EOF" >> $GITHUB_ENV
           echo "$(./toolset/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
