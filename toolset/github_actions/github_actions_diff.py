@@ -62,12 +62,12 @@ is_PR = (os.getenv("PR_NUMBER") != "")
 is_master = not is_PR and os.getenv("BRANCH_NAME") == "master"
 
 if is_PR:
-    curr_branch = "HEAD"
+    curr_branch = "FETCH_HEAD"
 elif not is_master:
     curr_branch = os.getenv("GITHUB_SHA")
+    # Also fetch master to compare against
+    subprocess.check_output(['bash', '-c', 'git fetch origin master:master'])
 
-# Also fetch master to compare against
-subprocess.check_output(['bash', '-c', 'git fetch origin master:master'])
 # https://stackoverflow.com/questions/25071579/list-all-files-changed-in-a-pull-request-in-git-github
 changes = clean_output(
     subprocess.check_output([
