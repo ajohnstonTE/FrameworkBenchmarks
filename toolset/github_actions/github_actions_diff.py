@@ -59,15 +59,17 @@ def quit_diffing():
 curr_branch = ""
 is_PR = (os.getenv("PR_NUMBER") != "")
 # BRANCH_NAME is the the name of the branch
-is_master = not is_PR and os.getenv("BRANCH_NAME") == "master"
+is_master = os.getenv("BRANCH_NAME") == "master"
 
 if is_PR:
     curr_branch = "HEAD"
 elif not is_master:
     curr_branch = os.getenv("GITHUB_SHA")
 
-# Also fetch master to compare against
-subprocess.check_output(['bash', '-c', 'git fetch origin master:master'])
+if not is_master:
+    # Also fetch master to compare against
+    subprocess.check_output(['bash', '-c', 'git fetch origin master:master'])
+
 # https://stackoverflow.com/questions/25071579/list-all-files-changed-in-a-pull-request-in-git-github
 changes = clean_output(
     subprocess.check_output([
@@ -98,7 +100,7 @@ elif os.getenv("TESTDIR"):
     test_dirs = os.getenv("TESTDIR").split(' ')
 
 # Forced full run
-if is_master or re.search(r'\[ci run-all\]', last_commit_msg, re.M):
+if (not is_PR and is_master) or re.search(r'\[ci run-all\]', last_commit_msg, re.M):
     print("All tests have been forced to run from the commit message.")
     run_tests = test_dirs
     quit_diffing()
