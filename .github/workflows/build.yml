@@ -104,14 +104,6 @@ jobs:
       - name: Log status
         run: |
           if [ "$RUN_TESTS" ]; then echo "Proceeding to run tests."; else echo 'Skipping test verification.'; fi
-      - name: Build tfb dockerfile
-        if: ${{ env.RUN_TESTS }}
-        run: docker build -t techempower/tfb - < ./Dockerfile;
-      - name: Stop services
-        # Stop services that would claim ports we may need
-        run: |
-          sudo service mysql stop || true
-          sudo service postgresql stop || true
       - name: Download the toolset
         if: ${{ env.RUN_TESTS }}
         run: |
