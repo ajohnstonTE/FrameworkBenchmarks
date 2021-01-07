@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# @file:        toolset/github_actions/github_actions_diff.py
+# @file:        utils/github_actions/github_actions_diff.py
 # @author:      Nate Brady
 #
 # @description: This script is only for use within Github Actions. It is meant
@@ -8,7 +8,7 @@
 # framework test directory needs to be run. It compares the state of the PR
 # branch against the target branch.
 #
-# Any changes found in the toolset/* directory other than continuous/*,
+# Any changes found in the utils/* directory other than continuous/*,
 # github_actions/* and scaffolding/* will cause all tests to be run.
 #
 # The following commands can be put in commit messages to affect which tests
@@ -156,8 +156,8 @@ if re.search(r'\[ci lang .+\]', last_commit_msg, re.M):
 
 
 # Ignore travis, github_actions, continuous and scaffolding changes
-if re.search(r'^toolset\/(?!(travis\/|github_actions\/|continuous\/|scaffolding\/))', changes, re.M) is not None:
-    print("Found changes to core toolset. Running all tests.")
+if re.search(r'^utils\/(?!(travis\/|github_actions\/|continuous\/|scaffolding\/))', changes, re.M) is not None:
+    print("Found changes to core utils. Running all tests.")
     run_tests = test_dirs
     quit_diffing()
 

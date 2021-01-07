@@ -120,7 +120,7 @@ jobs:
         run: |
           # Write the result to env.DIFF for later steps
           echo "DIFF<<EOF" >> $GITHUB_ENV
-          echo "$(./toolset/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
+          echo "$(./utils/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - id: should_run_tests
         name: Determine which (if any) tests need to be run
