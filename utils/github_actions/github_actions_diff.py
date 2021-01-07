@@ -155,8 +155,8 @@ if re.search(r'\[ci lang .+\]', last_commit_msg, re.M):
                 run_tests.append(test)
 
 
-# Ignore travis, github_actions, continuous and scaffolding changes
-if re.search(r'^utils\/(?!(travis\/|github_actions\/|continuous\/|scaffolding\/))', changes, re.M) is not None:
+# Ignore github_actions, continuous and scaffolding changes
+if re.search(r'^utils\/(?!(github_actions\/|continuous\/|scaffolding\/))', changes, re.M) is not None:
     print("Found changes to core utils. Running all tests.")
     run_tests = test_dirs
     quit_diffing()
