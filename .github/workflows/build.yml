@@ -136,18 +136,16 @@ jobs:
       - name: Log status
         run: |
           if [ "$RUN_TESTS" ]; then echo "Proceeding to run tests."; else echo 'Skipping test verification.'; fi
-      - name: Build tfb dockerfile
+      - name: Download the toolset
         if: ${{ env.RUN_TESTS }}
-        run: docker build -t techempower/tfb - < ./Dockerfile;
-      - name: Stop services
-        # Stop services that would claim ports we may need
         run: |
-          sudo service mysql stop || true
-          sudo service postgresql stop || true
+          curl https://github.com/TechEmpower/TFBToolset/releases/latest/download/tfb_toolset -L --output tfb_toolset
+          sudo chmod +x tfb_toolset
       - name: Run tests if needed
         if: ${{ env.RUN_TESTS }}
         run: |
           # run-ci.py runs the diffing to see if github actions needs to test this framework. Ideally/eventually,
           # we'd like to try and do the diffing before github_actions_clean & setup.
           # This will run the tests exactly as you would in your own vm:
-          docker network create tfb > /dev/null 2>&1 && docker run --network=tfb -v /var/run/docker.sock:/var/run/docker.sock --mount type=bind,source=`pwd`,target=/FrameworkBenchmarks techempower/tfb --mode verify --test-dir $RUN_TESTS --results-environment Github-Actions;
+          ./tfb_toolset --mode verify --test-dir $RUN_TESTS --results-environment Github-Actions;
+
