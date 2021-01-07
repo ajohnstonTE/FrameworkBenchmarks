@@ -147,5 +147,4 @@ jobs:
           # run-ci.py runs the diffing to see if github actions needs to test this framework. Ideally/eventually,
           # we'd like to try and do the diffing before github_actions_clean & setup.
           # This will run the tests exactly as you would in your own vm:
-          ./tfb_toolset --mode verify --test-dir $RUN_TESTS --results-environment Github-Actions;
-
+          ./tfb_toolset --mode cicd --test-dir $RUN_TESTS --results-environment Github-Actions;
