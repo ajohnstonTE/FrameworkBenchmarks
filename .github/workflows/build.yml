@@ -59,6 +59,8 @@ jobs:
           COMMIT_MESSAGE="${COMMIT_MESSAGE//$'\r'/'%0D'}"
           echo "::set-output name=commit_message::$COMMIT_MESSAGE"
           echo "::set-output name=branch_name::$BRANCH_NAME"
+          echo "::set-output name=branch_name::$BRANCH_NAME"
+          echo "::set-output name=previous_commit::$PREVIOUS_COMMIT"
       - id: verify_out
         name: Write verify job matrix
         run: |
@@ -72,6 +74,7 @@ jobs:
     outputs:
       commit_message: ${{ steps.event_out.outputs.commit_message }}
       branch_name: ${{ steps.event_out.outputs.branch_name }}
+      previous_commit: ${{ steps.event_out.outputs.previous_commit }}
       verify_matrix: ${{ steps.verify_out.outputs.verify_matrix }}
   verify:
     needs: setup
@@ -88,6 +91,7 @@ jobs:
       TESTDIR: ${{ matrix.TESTDIR }}
       COMMIT_MESSAGE: ${{ needs.setup.outputs.commit_message }}
       BRANCH_NAME: ${{ needs.setup.outputs.branch_name }}
+      PREVIOUS_COMMIT: ${{ needs.setup.outputs.previous_commit }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - uses: actions/checkout@v2
