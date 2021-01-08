@@ -67,7 +67,6 @@ jobs:
           # with a TESTLANG object in the include array for each language under frameworks
           VERIFY_MATRIX=$(ls -1 frameworks | jq -Rc '.+"/" | select(inside(env.RUN_TESTS))  | rtrimstr("/")' | jq -sc '{include: map({TESTLANG: .})}')
           echo "::set-output name=verify_matrix::$VERIFY_MATRIX"
-          echo $VERIFY_MATRIX
     outputs:
       commit_message: ${{ steps.event_out.outputs.commit_message }}
       branch_name: ${{ steps.event_out.outputs.branch_name }}
