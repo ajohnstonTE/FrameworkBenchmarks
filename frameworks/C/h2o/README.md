@@ -18,7 +18,7 @@ If the test environment changes, it will probably be necessary to tune some of t
 
 ### Database updates
 
-In the Citrine environment the database connection settings that improve the performance on the updates test make the other database results worse, and vice versa.
+In the Citrine environment the database connection settings that improve the performance on the updates test make the other database results worse and vice versa.
 
 ### Plaintext
 
