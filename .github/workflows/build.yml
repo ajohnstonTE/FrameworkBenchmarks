@@ -17,8 +17,14 @@ jobs:
         with:
           fetch-depth: 10
       - name: log stuff
+        if: github.event_name == 'push'
         run: |
           PREVIOUS_COMMIT=$(git show HEAD^1)
+          echo $PREVIOUS_COMMIT
+      - name: log stuff
+        if: github.event_name == 'pull_request'
+        run: |
+          PREVIOUS_COMMIT=$(git show HEAD^3)
           echo $PREVIOUS_COMMIT
       # In case of a push event, the commit we care about is simply HEAD.
       # The current branch name can be found by parsing GITHUB_REF, for example,
