@@ -44,8 +44,9 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          echo "DIFF<<EOF" >> $GITHUB_ENV
-          echo "$(./toolset/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
+          DIFF=$(./toolset/github_actions/github_actions_diff.py)
+          echo "RUN_TESTS<<EOF" >> $GITHUB_ENV
+          echo "$(grep -oP "github-actions-run-tests \K(.*)" <<< $DIFF || true)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - id: event_out
         name: Write event outputs
@@ -64,7 +65,7 @@ jobs:
           # include:
           #   - TESTLANG: {lang}
           # with a TESTLANG object in the include array for each language under frameworks
-          VERIFY_MATRIX=$(ls -1 frameworks | jq -Rc '.+"/" | select(inside(env.DIFF))  | rtrimstr("/")' | jq -sc '{include: map({TESTLANG: .})}')
+          VERIFY_MATRIX=$(ls -1 frameworks | jq -Rc '.+"/" | select(inside(env.RUN_TESTS))  | rtrimstr("/")' | jq -sc '{include: map({TESTLANG: .})}')
           echo "::set-output name=verify_matrix::$VERIFY_MATRIX"
     outputs:
       commit_message: ${{ steps.event_out.outputs.commit_message }}
@@ -72,7 +73,7 @@ jobs:
       verify_matrix: ${{ steps.verify_out.outputs.verify_matrix }}
   verify:
     needs: setup
-    if: ${{ !contains(needs.setup.outputs.commit_message, '[ci skip]') }}
+    if: ${{ !contains(needs.setup.outputs.commit_message, '[ci skip]') && fromJSON(needs.setup.outputs.verify_matrix).include.length > 0 }}
     runs-on: ubuntu-18.04
     strategy:
       matrix: ${{ fromJSON(needs.setup.outputs.verify_matrix) }}
