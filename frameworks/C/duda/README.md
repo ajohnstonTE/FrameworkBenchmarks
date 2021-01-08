@@ -20,7 +20,7 @@ URL: /plaintext
 
 ## About pending tests
 
-Most of tests that are related to database query are pending and will be available for the next Round.
+Most of the tests that are related to database query are pending and will be available for the next Round.
 
 ## Contact
 
