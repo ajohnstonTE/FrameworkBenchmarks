@@ -73,7 +73,7 @@ jobs:
       verify_matrix: ${{ steps.verify_out.outputs.verify_matrix }}
   verify:
     needs: setup
-    if: ${{ !contains(needs.setup.outputs.commit_message, '[ci skip]') && fromJSON(needs.setup.outputs.verify_matrix).include.length > 0 }}
+    if: ${{ !contains(needs.setup.outputs.commit_message, '[ci skip]') && contains(needs.setup.outputs.verify_matrix, 'TESTLANG') }}
     runs-on: ubuntu-18.04
     strategy:
       matrix: ${{ fromJSON(needs.setup.outputs.verify_matrix) }}
