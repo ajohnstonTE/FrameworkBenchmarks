@@ -108,7 +108,7 @@ else:
             test_dirs.append(framework)
 
 # Forced full run
-if (not is_PR and is_master) or re.search(r'\[ci run-all\]', last_commit_msg, re.M):
+if re.search(r'\[ci run-all\]', last_commit_msg, re.M):
     print("All tests have been forced to run from the commit message.")
     run_tests = test_dirs
     quit_diffing()
