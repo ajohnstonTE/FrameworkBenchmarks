@@ -55,7 +55,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           echo "DIFF<<EOF" >> $GITHUB_ENV
-          echo "$(./toolset/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
+          echo "$(./utils/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       - name: Determine which (if any) tests need to be run
         run: |
