@@ -1,9 +1,9 @@
 name: build
 on:
   push:
-    branches: [ master ]
+    branches: [ master, test-no-full-master-runs ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, test-no-full-master-runs ]
 jobs:
   setup:
     runs-on: ubuntu-20.04
@@ -16,6 +16,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 10
+      - name: log stuff
+        env:
+          JSON: ${{ toJson(github.event) }}
+        run: echo $JSON
       # In case of a push event, the commit we care about is simply HEAD.
       # The current branch name can be found by parsing GITHUB_REF, for example,
       # if we are on the master branch, then GITHUB_REF = refs/heads/master.
