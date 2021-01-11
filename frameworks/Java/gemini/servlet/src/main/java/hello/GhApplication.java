@@ -40,7 +40,6 @@ public class GhApplication
     return new PathDispatcher<>(this, config);
   }
 
-
   @Override
   protected ConnectorFactory constructConnectorFactory()
   {
