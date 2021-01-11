@@ -33,6 +33,7 @@
 
 static size_t get_index(size_t n, h2o_cache_hashcode_t keyhash)
 {
+
 	assert(is_power_of_2(n));
 	return keyhash & (n - 1);
 }
