@@ -46,7 +46,11 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          DIFF=$(./toolset/github_actions/github_actions_diff.py)
+          echo "DIFF<<EOF" >> $GITHUB_ENV
+          echo "$(./toolset/github_actions/github_actions_diff.py)" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Determine which (if any) tests need to be run
+        run: |
           echo "RUN_TESTS<<EOF" >> $GITHUB_ENV
           echo "$(grep -oP "github-actions-run-tests \K(.*)" <<< $DIFF || true)" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -101,8 +105,7 @@ jobs:
         with:
           python-version: '2.7'
           architecture: 'x64'
-      - id: get_diff
-        name: Get all changes vs master
+      - name: Get all changes vs master
         # Runs github_actions_diff, with the the output accessible in later steps
         run: |
           # Write the result to env.DIFF for later steps
