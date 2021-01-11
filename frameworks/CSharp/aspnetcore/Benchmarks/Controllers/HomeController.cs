@@ -14,7 +14,6 @@ namespace Benchmarks.Controllers
         [HttpGet("plaintext")]
         public IActionResult Plaintext()
         {
-
             return new PlainTextActionResult();
         }
 
