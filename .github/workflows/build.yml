@@ -1,9 +1,5 @@
 name: build
-on:
-  push:
-    branches: [ master, test-no-full-master-runs ]
-  pull_request:
-    branches: [ master, test-no-full-master-runs ]
+on: [ push, pull_request ]
 jobs:
   setup:
     runs-on: ubuntu-20.04
