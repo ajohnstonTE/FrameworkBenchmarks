@@ -1,6 +1,17 @@
 [framework]
 name = "aspnetcore"
 
+[main]
+urls.plaintext = "/plaintext"
+urls.json = "/json"
+approach = "Realistic"
+classification = "Platform"
+os = "Linux"
+orm = "Raw"
+platform = ".NET"
+webserver = "Kestrel"
+versus = "aspcore"
+
 [pgo]
 urls.plaintext = "/plaintext"
 urls.json = "/json"
@@ -266,17 +277,6 @@ orm = "Full"
 platform = ".NET"
 webserver = "Kestrel"
 versus = "aspcore-ado-pg"
-
-[main]
-urls.plaintext = "/plaintext"
-urls.json = "/json"
-approach = "Realistic"
-classification = "Platform"
-os = "Linux"
-orm = "Raw"
-platform = ".NET"
-webserver = "Kestrel"
-versus = "aspcore"
 
 [mvc-dap-pg-up]
 urls.update = "/mvc/updates/dapper?queries="
