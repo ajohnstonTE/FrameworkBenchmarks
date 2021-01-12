@@ -2,8 +2,8 @@ FROM ubuntu:18.04
 
 COPY ./ ./
 
-RUN apt-get update -yqq && \
-	 apt-get install -yqq software-properties-common build-essential curl locales wget unzip git \
+RUN apt-get update -yqq
+RUN apt-get install -yqq software-properties-common build-essential curl locales wget unzip git \
     libmysqlclient-dev libpq-dev \
     libpcre3 libpcre3-dev \
     libssl-dev libcurl4-openssl-dev \
@@ -15,10 +15,10 @@ RUN apt-get update -yqq && \
     liborc-0.4-0 \
     libmcrypt-dev libicu-dev \
     re2c libnuma-dev \
-	 postgresql-server-dev-all libcap2-bin && \
-	 add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
-	 apt-get update -yqq && \
-	 apt-get install -yqq gcc-8 g++-8
+	postgresql-server-dev-all libcap2-bin
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
+	apt-get update -yqq && \
+	apt-get install -yqq gcc-8 g++-8
 
 RUN locale-gen en_US.UTF-8
 
